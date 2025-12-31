@@ -75,11 +75,9 @@ app.post("/upload", upload.single("audio"), async (req: Request, res: Response) 
             }
         );
 
-        form.append("language", config.WhisperLanguage);
-        form.append("task", WHISPER_TASK);
-
         // 2) Send to Whisper
-        const whisperResp = await fetch(config.WhisperUrl, {
+        const actionUrl =`${config.WhisperUrl}?task=${WHISPER_TASK}&language=${config.WhisperLanguage}&output=json`;
+        const whisperResp = await fetch(actionUrl, {
             method: "POST",
             body: form as any,
             headers: form.getHeaders() as any,
@@ -107,7 +105,14 @@ app.post("/upload", upload.single("audio"), async (req: Request, res: Response) 
         return res.status(500).json({ ok: false, error: String(e) });
     } finally {
         // cleanup temp file
-        try { fs.unlinkSync(filePath); } catch { /* ignore */ }
+        if(!config.DeleteTempFiles) return;
+
+        try {
+            fs.unlinkSync(filePath);
+        }
+        catch {
+            /* ignore */
+        }
     }
 });
 

@@ -49,4 +49,8 @@ export class ConfigHelper {
     get AppPort(): number {
         return Number(this.envConfig.APP_PORT || '3333');
     }
+
+    get DeleteTempFiles(): boolean {
+        return (this.envConfig.DELETE_TEMP_FILES || 'false').toLowerCase() === 'true';
+    }
 }
